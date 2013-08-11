@@ -68,18 +68,19 @@ EOF
      $src/configure   \
 		--prefix=$prefix      \
 		2>&1
+     rc=$?
   } ||
   {
      $src/configure   \
 		--prefix=$prefix      \
 		${configure_args}
 		2>&1
+     rc=$?
   }
   
   set +x
   echo "==== end configure ===="
   
-  rc=$?
   [ "$rc" -ne 0 ] && make  2>&1
   
   rc=$?
