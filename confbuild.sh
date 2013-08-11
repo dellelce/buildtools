@@ -62,7 +62,8 @@ EOF
   export LDFLAGS="-L$prefix/lib"
   
   cd "$build"
-  
+ 
+  export start_conf="$(date +%s)" 
   [ -z "$configure_args" ] &&
   {
      $src/configure   \
@@ -77,15 +78,31 @@ EOF
 		2>&1
      rc=$?
   }
+  export end_conf="$(date +%s)" 
+  let elapsed_conf="(( $end_conf - $start_conf ))"
   
   set +x
+  echo
+  echo "elapsed configure: ${elapsed_conf}"
   echo "==== end configure ===="
-  
+
+  export start_make="$(date +%s)" 
   [ "$rc" -ne 0 ] && make  2>&1
-  
   rc=$?
+  export end_make="$(date +%s)" 
+  echo
+  echo "elapsed make: ${elapsed_make}"
+  echo "==== end make ===="
+  
+  export start_makei="$(date +%s)" 
   [ "$rc" -ne 0 ] && make  install 2>&1
+  rc=$?
+  export end_makei="$(date +%s)" 
+  echo
+  echo "elapsed make install: ${elapsed_makei}"
+  echo "==== end make install ===="
 } 2>&1 |  tee "${logfile}"
 
+exit $rc
 
 ### EOF ###
