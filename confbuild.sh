@@ -74,7 +74,7 @@ EOF
   {
      $src/configure   \
 		--prefix=$prefix      \
-		${configure_args}
+		${configure_args}     \
 		2>&1
      rc=$?
   }
@@ -87,7 +87,7 @@ EOF
   echo "==== end configure ===="
 
   export start_make="$(date +%s)" 
-  [ "$rc" -ne 0 ] && make  2>&1
+  [ "$rc" -ne 0 ] && {  make  2>&1; } || { exit "$rc"; } 
   rc=$?
   export end_make="$(date +%s)" 
   echo
