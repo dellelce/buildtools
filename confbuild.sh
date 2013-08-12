@@ -57,9 +57,12 @@ EOF
 
 {
   set -x
-  export CFLAGS="-I$prefix/include"
-  export CXXFLAGS="-I$prefix/include"
-  export LDFLAGS="-L$prefix/lib"
+
+  [ -z "$CFLAGS" ] && { export CFLAGS="-I$prefix/include"; } || { export CFLAGS="$CFLAGS -I$prefix/include"; }
+
+  [ -z "$CXXFLAGS" ] && { export CXXFLAGS="-I$prefix/include"; } || { export CXXFLAGS="$CXXFLAGS -I$prefix/include"; } 
+
+  [ -z "$LDFLAGS" ] && { export LDFLAGS="-L$prefix/lib"; } || { export LDFLAGS="$LDFLAGS -L$prefix/lib"; } 
   
   cd "$build"
  
