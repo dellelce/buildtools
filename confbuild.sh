@@ -67,6 +67,7 @@ EOF
   cd "$build"
  
   export start_conf="$(date +%s)" 
+  export rc=0
   [ -z "$configure_args" ] &&
   {
      $src/configure   \
@@ -84,13 +85,12 @@ EOF
   export end_conf="$(date +%s)" 
   let elapsed_conf="(( $end_conf - $start_conf ))"
   
-  set +x
   echo
   echo "elapsed configure: ${elapsed_conf}"
   echo "==== end configure ===="
 
   export start_make="$(date +%s)" 
-  [ "$rc" -ne 0 ] && {  make  2>&1; } || { exit "$rc"; } 
+  [ "$rc" -eq 0 ] && {  make  2>&1; } || { exit "$rc"; } 
   rc=$?
   export end_make="$(date +%s)" 
   echo
@@ -98,7 +98,7 @@ EOF
   echo "==== end make ===="
   
   export start_makei="$(date +%s)" 
-  [ "$rc" -ne 0 ] && make  install 2>&1
+  [ "$rc" -eq 0 ] && make  install 2>&1
   rc=$?
   export end_makei="$(date +%s)" 
   echo
