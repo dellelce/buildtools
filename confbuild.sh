@@ -19,12 +19,81 @@ fail()
   exit 1
 }
 
+mainBanner()
+{
+  cat << EOF
+
+ID is       ${id}
+Source is   ${src}
+Build is    ${build}
+Log file is ${logfile}
+
+EOF
+}
+
+# run configure step
+build_configure()
+{
+  export start_conf="$(date +%s)"
+  [ -z "$configure_args" ] &&
+  {
+     $src/configure   \
+                --prefix=$prefix      \
+                2>&1 
+     rc=$?
+  } ||
+  {
+     $src/configure   \
+                --prefix=$prefix      \
+                ${configure_args}     \
+                2>&1
+     rc=$?
+  }
+  export end_conf="$(date +%s)" 
+  let elapsed_conf="(( $end_conf - $start_conf ))"
+}
+
+msg_configure()
+{
+  echo
+  echo "elapsed configure: ${elapsed_conf}"
+  echo "==== end configure ===="
+}
+
+# run configure step
+build_make()
+{
+  echo work in progress
+}
+
+msg_make()
+{
+  echo
+  echo "elapsed make: ${elapsed_make}"
+  echo "==== end make ===="
+}
+
+# run configure step
+build_makeinstall()
+{
+  echo work in progress
+}
+
+msg_makeinstall()
+{
+  echo
+  echo "elapsed make install: ${elapsed_makei}"
+  echo "==== end make install ===="
+}
+
 ### ENV ###
 
+export rc=0
 
 buildFile="$1"
 [ ! -f "$buildFile" ] &&
 {
+  # this should go and be replaced by an error message or by some defaults
   prefix="/home/antonio/src/web/mediawiki/mwpython/root"
   src="$PWD/bison-2.7.1"
   build="build_2255_200613"
@@ -38,16 +107,9 @@ buildFile="$1"
 logsdir="$PWD/logs"
 logfile="${logsdir}/log.${id}.$(now).txt"
 
-
 ### MAIN ###
-cat << EOF
 
-ID is       ${id}
-Source is   ${src}
-Build is    ${build}
-Log file is ${logfile}
-
-EOF
+mainBanner
 
 [ ! -d "logs" ] &&
 {
@@ -67,7 +129,6 @@ EOF
   cd "$build"
  
   export start_conf="$(date +%s)" 
-  export rc=0
   [ -z "$configure_args" ] &&
   {
      $src/configure   \
@@ -84,26 +145,21 @@ EOF
   }
   export end_conf="$(date +%s)" 
   let elapsed_conf="(( $end_conf - $start_conf ))"
-  
-  echo
-  echo "elapsed configure: ${elapsed_conf}"
-  echo "==== end configure ===="
 
+  msg_configure
+  
   export start_make="$(date +%s)" 
   [ "$rc" -eq 0 ] && {  make  2>&1; } || { exit "$rc"; } 
   rc=$?
   export end_make="$(date +%s)" 
-  echo
-  echo "elapsed make: ${elapsed_make}"
-  echo "==== end make ===="
+
+  msg_make
   
   export start_makei="$(date +%s)" 
   [ "$rc" -eq 0 ] && make  install 2>&1
   rc=$?
   export end_makei="$(date +%s)" 
-  echo
-  echo "elapsed make install: ${elapsed_makei}"
-  echo "==== end make install ===="
+  msg_makeinstall
 } 2>&1 |  tee "${logfile}"
 
 exit $rc
