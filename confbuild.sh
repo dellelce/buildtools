@@ -90,6 +90,7 @@ msg_makeinstall()
 
 export rc=0
 
+# build profile
 buildFile="$1"
 [ ! -f "$buildFile" ] &&
 {
@@ -102,8 +103,10 @@ buildFile="$1"
 {
   . "${buildFile}"
   [ -z "${prefix}" -o -z "${src}" -o -z "${build}" -o -z "${id}" ] && fail "invalid profile"
+  [ ! -d "${src}" ] && failed "invalid source"
 }
 
+#
 logsdir="$PWD/logs"
 logfile="${logsdir}/log.${id}.$(now).txt"
 
@@ -111,19 +114,17 @@ logfile="${logsdir}/log.${id}.$(now).txt"
 
 mainBanner
 
-[ ! -d "logs" ] &&
+[ ! -d "$logsdir" ] &&
 {
   echo "logs directory missing"
-  mkdir logs
+  mkdir -p "$logsdir"
 }
 
 {
-  set -x
+  #only if debugging: set -x
 
   [ -z "$CFLAGS" ] && { export CFLAGS="-I$prefix/include"; } || { export CFLAGS="$CFLAGS -I$prefix/include"; }
-
   [ -z "$CXXFLAGS" ] && { export CXXFLAGS="-I$prefix/include"; } || { export CXXFLAGS="$CXXFLAGS -I$prefix/include"; } 
-
   [ -z "$LDFLAGS" ] && { export LDFLAGS="-L$prefix/lib"; } || { export LDFLAGS="$LDFLAGS -L$prefix/lib"; } 
   
   cd "$build"
